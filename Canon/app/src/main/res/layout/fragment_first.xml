@@ -6,15 +6,46 @@
     android:layout_height="match_parent"
     tools:context=".FirstFragment">
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/enviarAnguloId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
-        android:text="Enviar Angulo"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="Enviar Angulo"
+        app:backgroundTint="#009688"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:rippleColor="#8BC34A"
+        app:srcCompat="@drawable/angle" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fuegoId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:contentDescription="Disparar"
+        app:backgroundTint="#E91E63"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/enviarAnguloId"
+        app:layout_constraintTop_toTopOf="@+id/enviarAnguloId"
+        app:rippleColor="#FF9800"
+        app:srcCompat="@drawable/target" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bluetoothId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:contentDescription="Conectar a Dispositivo"
+        app:backgroundTint="#3F51B5"
+        app:layout_constraintEnd_toStartOf="@+id/enviarAnguloId"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/enviarAnguloId"
+        app:rippleColor="#03A9F4"
+        app:srcCompat="@drawable/bluetooth" />
 
     <EditText
         android:id="@+id/velocidadInicialId"
@@ -32,8 +63,10 @@
         android:id="@+id/anguloId"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:max="10"
-        android:progress="5"
+        android:max="90"
+        android:progress="0"
+        android:progressTint="#03A9F4"
+        android:thumbTint="#03A9F4"
         app:layout_constraintBottom_toTopOf="@+id/distanciaXId"
         app:layout_constraintEnd_toStartOf="@+id/textView2"
         app:layout_constraintStart_toEndOf="@+id/textView"
@@ -43,8 +76,11 @@
         android:id="@+id/distanciaXId"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:max="100"
+        android:progressTint="#9C27B0"
+        android:thumbTint="#9C27B0"
         app:layout_constraintBottom_toTopOf="@+id/enviarAnguloId"
-        app:layout_constraintEnd_toStartOf="@+id/textView4"
+        app:layout_constraintEnd_toStartOf="@+id/textMaxXId"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/velocidadInicialId" />
@@ -53,8 +89,11 @@
         android:id="@+id/distanciaYId"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:max="100"
+        android:progressTint="#FFC107"
+        android:thumbTint="#FFC107"
         app:layout_constraintBottom_toTopOf="@+id/enviarAnguloId"
-        app:layout_constraintEnd_toStartOf="@+id/textView6"
+        app:layout_constraintEnd_toStartOf="@+id/textMaxYId"
         app:layout_constraintStart_toEndOf="@+id/textView5"
         app:layout_constraintTop_toBottomOf="@+id/distanciaXId" />
 
@@ -81,16 +120,16 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="0.00"
+        android:text="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/distanciaXId" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/textMaxXId"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="100.00"
+        android:text="100.0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/distanciaXId" />
 
@@ -99,16 +138,16 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="0.00"
+        android:text="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/distanciaYId" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/textMaxYId"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="100.00"
+        android:text="100.0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/distanciaYId" />
 
@@ -118,16 +157,16 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="Angulo"
-        app:layout_constraintBottom_toTopOf="@+id/textView8"
+        app:layout_constraintBottom_toTopOf="@+id/textAnguloId"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/textAnguloId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="45°"
+        android:text="0.0°"
         app:layout_constraintBottom_toTopOf="@+id/anguloId"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
@@ -139,16 +178,16 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="Distancia máxima recorrida (m)"
-        app:layout_constraintBottom_toTopOf="@+id/textView10"
+        app:layout_constraintBottom_toTopOf="@+id/textDistanciaXId"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView10"
+        android:id="@+id/textDistanciaXId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="5 m"
+        android:text="0.0 m"
         app:layout_constraintBottom_toTopOf="@+id/distanciaXId"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -159,16 +198,16 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="Altura máxima recorrida (m)"
-        app:layout_constraintBottom_toTopOf="@+id/textView12"
+        app:layout_constraintBottom_toTopOf="@+id/textDistanciaYId"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView12"
+        android:id="@+id/textDistanciaYId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="5 m"
+        android:text="0.0 m"
         app:layout_constraintBottom_toTopOf="@+id/distanciaYId"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
