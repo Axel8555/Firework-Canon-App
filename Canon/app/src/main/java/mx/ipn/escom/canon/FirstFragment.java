@@ -1,6 +1,8 @@
 package mx.ipn.escom.canon;
 
+import android.Manifest;
 import android.app.ActionBar;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -25,10 +28,24 @@ import com.google.android.material.snackbar.Snackbar;
 
 import mx.ipn.escom.canon.databinding.FragmentFirstBinding;
 
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Set;
+import java.util.UUID;
+
 public class FirstFragment extends Fragment {
-
     private FragmentFirstBinding binding;
-
+    private BluetoothDevice hc05 = null;
+    private BluetoothSocket btSocket = null;
+    static final UUID mUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    static final String nombreDispositivoBT = "HC-05";
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -41,6 +58,7 @@ public class FirstFragment extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
         FloatingActionButton disparar = (FloatingActionButton) view.findViewById(R.id.fuegoId);
         FloatingActionButton enviarAngulo = (FloatingActionButton) view.findViewById(R.id.enviarAnguloId);
@@ -49,33 +67,67 @@ public class FirstFragment extends Fragment {
         SeekBar angulo = (SeekBar) view.findViewById(R.id.anguloId);
         TextView textAngulo = (TextView) view.findViewById(R.id.textAnguloId);
         SeekBar distanciaX = (SeekBar) view.findViewById(R.id.distanciaXId);
-        TextView textDistanciaX = (TextView) view.findViewById(R.id.textDistanciaXId);;
+        TextView textDistanciaX = (TextView) view.findViewById(R.id.textDistanciaXId);
         TextView textMaxX = (TextView) view.findViewById(R.id.textMaxXId);
         SeekBar distanciaY = (SeekBar) view.findViewById(R.id.distanciaYId);
         TextView textDistanciaY = (TextView) view.findViewById(R.id.textDistanciaYId);
         TextView textMaxY = (TextView) view.findViewById(R.id.textMaxYId);
         MediaPlayer myMediaPlayer = MediaPlayer.create(getContext(), R.raw.fire);
 
+
         enviarAngulo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "No hay permisos", Toast.LENGTH_SHORT).show();
+                return;
+            }else if(hc05 == null){
+                Toast.makeText(getContext(), "No se encontró \"HC-05\" vinculado", Toast.LENGTH_SHORT).show();
+                return;
+            }else if(btSocket == null){
+                Toast.makeText(getContext(), "No se ha conectado", Toast.LENGTH_SHORT).show();
+
+                return;
+            }
+            else{
                 float seekValue = angulo.getProgress();
                 String x = Float.toString(seekValue) + "º";
-                Snackbar.make(view, "Enviando: "+x, 1000*10).show();
+                Snackbar.make(view, "Enviando: " + x, 1000 * 10).show();
                 enviarAngulo.setEnabled(false);
                 disparar.setEnabled(false);
                 bluetoothButton.setEnabled(false);
-                new CountDownTimer(10*1000,1000){
+
+                Toast.makeText(getContext(), hc05.getName(), Toast.LENGTH_SHORT).show();
+
+                new CountDownTimer(10 * 1000, 1000) {
                     public void onFinish() {
                         enviarAngulo.setEnabled(true);
                         disparar.setEnabled(true);
                         bluetoothButton.setEnabled(true);
                     }
-
                     public void onTick(long millisUntilFinished) {
-                        // millisUntilFinished    The amount of time until finished.
                     }
                 }.start();
+
+                try {
+                    OutputStream outputStream = btSocket.getOutputStream();
+                    outputStream.write((int) (48+Math.round(seekValue/10.0)));//48 es 0 en ASCII
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                InputStream inputStream = null;
+                try {
+                    inputStream = btSocket.getInputStream();
+                    inputStream.skip(inputStream.available());
+                    byte b = (byte) inputStream.read();
+                    System.out.println((char) b);
+                    Toast.makeText(getContext(), "Recibido: "+(char) b, Toast.LENGTH_SHORT).show();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
                 /*NavHostFragment.findNavController(FirstFragment.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment);*/
             }
@@ -83,50 +135,97 @@ public class FirstFragment extends Fragment {
         disparar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                float seekValue = angulo.getProgress();
-                String x = Float.toString(seekValue) + "º";
-                Snackbar.make(view, "¡Disparando!", 1000*3).show();
+
+                Snackbar.make(view, "¡Disparando!", 1000 * 3).show();
                 enviarAngulo.setEnabled(false);
                 disparar.setEnabled(false);
                 bluetoothButton.setEnabled(false);
                 myMediaPlayer.start();
-                new CountDownTimer(3*1000,1000){
+                new CountDownTimer(3 * 1000, 1000) {
                     public void onFinish() {
                         enviarAngulo.setEnabled(true);
                         disparar.setEnabled(true);
                         bluetoothButton.setEnabled(true);
                     }
-
                     public void onTick(long millisUntilFinished) {
-                        // millisUntilFinished    The amount of time until finished.
                     }
                 }.start();
-                /*NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);*/
             }
         });
         bluetoothButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                float seekValue = angulo.getProgress();
-                String x = Float.toString(seekValue) + "º";
-                Snackbar.make(view, "Conectando...", 1000*3).show();
-                enviarAngulo.setEnabled(false);
-                disparar.setEnabled(false);
-                bluetoothButton.setEnabled(false);
-                new CountDownTimer(3*1000,1000){
-                    public void onFinish() {
-                        enviarAngulo.setEnabled(true);
-                        disparar.setEnabled(true);
-                        bluetoothButton.setEnabled(true);
-                    }
 
-                    public void onTick(long millisUntilFinished) {
-                        // millisUntilFinished    The amount of time until finished.
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getContext(), "No hay permisos", Toast.LENGTH_SHORT).show();
+                    return;
+                }else if(btSocket != null){
+                    Snackbar.make(view, "Desconectando...", 1000 * 3).show();
+                    enviarAngulo.setEnabled(false);
+                    disparar.setEnabled(false);
+                    bluetoothButton.setEnabled(false);
+
+                    new CountDownTimer(1*1000,1000){
+                        public void onFinish() {
+                            enviarAngulo.setEnabled(true);
+                            disparar.setEnabled(true);
+                            bluetoothButton.setEnabled(true);
+                        }
+                        public void onTick(long millisUntilFinished) {
+                        }
+                    }.start();
+
+                    try {
+                        btSocket.close();
+                        System.out.println(btSocket.isConnected());
+                    } catch(IOException e) {
+                        e.printStackTrace();
                     }
-                }.start();
-                /*NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);*/
+                }
+                else{
+                    Snackbar.make(view, "Conectando...", 1000 * 3).show();
+                    enviarAngulo.setEnabled(false);
+                    disparar.setEnabled(false);
+                    bluetoothButton.setEnabled(false);
+
+                    BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+                    Set<BluetoothDevice> dispositivos = btAdapter.getBondedDevices();
+
+                    for(BluetoothDevice bt : dispositivos)
+                        if(bt.getName().toString().equals(nombreDispositivoBT))
+                            hc05 = bt;
+
+                    new CountDownTimer(3*1000,1000){
+                        public void onFinish() {
+                            enviarAngulo.setEnabled(true);
+                            disparar.setEnabled(true);
+                            bluetoothButton.setEnabled(true);
+                        }
+                        public void onTick(long millisUntilFinished) {
+                        }
+                    }.start();
+
+                    int intento = 0;
+                    do {
+                        try {
+                            btSocket = hc05.createRfcommSocketToServiceRecord(mUUID);
+                            System.out.println(btSocket);
+                            btSocket.connect();
+                            System.out.println(btSocket.isConnected());
+                        } catch (IOException e) {
+
+                            e.printStackTrace();
+                        }
+                        intento++;
+                    } while (!btSocket.isConnected() && intento < 3);
+                }
+                if(btSocket.isConnected()){
+                    Toast.makeText(getContext(),"Conexión Exitosa :D", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getContext(),"Conexión Fallida :(", Toast.LENGTH_SHORT).show();
+                    btSocket = null;
+                }
+
             }
         });
 
