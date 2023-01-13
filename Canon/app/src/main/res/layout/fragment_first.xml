@@ -32,7 +32,7 @@
         app:layout_constraintStart_toEndOf="@+id/enviarAnguloId"
         app:layout_constraintTop_toTopOf="@+id/enviarAnguloId"
         app:rippleColor="#FF9800"
-        app:srcCompat="@drawable/target" />
+        app:srcCompat="@drawable/fire" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/bluetoothId"
@@ -54,7 +54,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:inputType="numberDecimal"
-        android:text="60.0"
+        android:text="30.0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView13" />
